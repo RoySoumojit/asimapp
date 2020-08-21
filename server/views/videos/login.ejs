@@ -1,0 +1,224 @@
+
+<!------ Include the above in your HEAD tag ---------->
+
+<!DOCTYPE html>
+<html lang="en" >
+    <head> 
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+		<title>Video login</title>
+
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+		<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<!-- The core Firebase JS SDK is always required and must be listed first -->
+	<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+
+	<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-firestore.js"></script>
+        <style>
+            /*
+/* Created by Filipe Pina
+ * Specific styles of signin, register, component
+ */
+/*
+ * General styles
+ */
+
+body, html{
+    height: 100%;
+    background-repeat: no-repeat;
+    background-color: #d3d3d3;
+    font-family: 'Oxygen', sans-serif;
+}
+
+.main{
+    margin-top: 70px;
+}
+
+h1.title { 
+   font-size: 50px;
+   font-family: 'Passion One', cursive; 
+   font-weight: 400; 
+}
+
+hr{
+   width: 10%;
+   color: #fff;
+}
+
+.form-group{
+   margin-bottom: 15px;
+}
+
+label{
+   margin-bottom: 15px;
+}
+
+input,
+input::-webkit-input-placeholder {
+   font-size: 11px;
+   padding-top: 3px;
+}
+
+.main-login{
+    background-color: #fff;
+   /* shadows and rounded borders */
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+   -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+   -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+
+}
+
+.main-center{
+    margin-top: 30px;
+    margin: 0 auto;
+    max-width: 330px;
+   padding: 40px 40px;
+
+}
+
+.login-button{
+   margin-top: 5px;
+}
+
+.login-register{
+   font-size: 11px;
+   text-align: center;
+}
+
+        </style>
+	</head>
+	<body >
+		<div class="container">
+			<div class="row main">
+				<div class="panel-heading">
+	               <div class="panel-title text-center">
+	               		<h1 class="title">Video Login</h1>
+	               		<hr />
+	               	</div>
+				</div> 
+				<div class="main-login main-center">
+					<form class="form-horizontal" name="myform" id="formsubmit" method="post">
+						<div class="form-group">
+							<label for="username" class="cols-sm-2 control-label">Userid</label>
+							<div class="cols-sm-10">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+									<input type="text"  class="form-control" name="userid" id="username"  placeholder="Enter your Userid"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="password" class="cols-sm-2 control-label">Password</label>
+							<div class="cols-sm-10">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+									<input type="password"  class="form-control" name="password" id="password"  placeholder="Enter your Password"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group ">
+							<button type="button" class="btn btn-primary btn-lg btn-block login-button" id="loginbtn">Sign in</button>
+						</div>
+						<p id="error" style="color:red;font-size:25px"></p>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+	
+<script>
+	(function(){
+		var firebaseConfig = {
+		   apiKey: "AIzaSyBT5aXT1mC1LBcT-4WPYumEzagrsnamXYI",
+		   authDomain: "asimmath.firebaseapp.com",
+		   databaseURL: "https://asimmath.firebaseio.com",
+		   projectId: "asimmath",
+		   storageBucket: "asimmath.appspot.com",
+		   messagingSenderId: "125226910718",
+		   appId: "1:125226910718:web:d36e16a2633c01eb5f76af"
+		 };
+	   
+		 // Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+	   console.log(document.getElementById("loginbtn"))
+	   document.getElementById("loginbtn").addEventListener('click',function(e){
+		 let email=document.getElementById("username").value
+		 let password=document.getElementById("password").value
+		 let button=document.getElementById("loginbtn")
+		 button.innerHTML="Submitting...."
+		 firebase.auth().signInWithEmailAndPassword(email,password).then((snap)=>{
+			 firebase.firestore().collection("users").doc(snap.user.uid).get().then((res)=>{
+				if(res.exists){
+					if(res.data().isLoggedIn){
+						document.getElementById("loginbtn").innerHTML="Submit"
+						document.getElementById("error").innerHTML="User already logged from this account"
+					}else{
+						res.ref.update({
+							isLoggedIn:true
+						}).then(()=>{
+							document.getElementById("formsubmit").setAttribute('action',`/video/api/<%=id%>/${snap.user.xa}`)
+							document.forms['myform'].submit()
+						}).catch((err)=>{
+							document.getElementById("loginbtn").innerHTML="Submit"
+							document.getElementById("error").innerHTML="Something went wrong"
+						})
+					}
+				}	
+			 })
+			
+		 }).catch(function(err){
+			document.getElementById("loginbtn").innerHTML="Submit"
+			document.getElementById("error").innerHTML="Give right credential"
+		 })
+	   })
+	   }())
+</script>
+	
+	 <!-- <script language="JavaScript">
+		window.onload = function () {
+			document.addEventListener("keydown", function (e) {
+				//document.onkeydown = function(e) {
+				// "I" key
+				if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+					disabledEvent(e);
+				}
+				// "J" key
+				if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+					disabledEvent(e);
+				}
+				// "S" key + macOS
+				if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+					disabledEvent(e);
+				}
+				// "U" key
+				if (e.ctrlKey && e.keyCode == 85) {
+					disabledEvent(e);
+				}
+				// "F12" key
+				if (event.keyCode == 123) {
+					disabledEvent(e);
+				}
+			}, false);
+			function disabledEvent(e) {
+				if (e.stopPropagation) {
+					e.stopPropagation();
+				} else if (window.event) {
+					window.event.cancelBubble = true;
+				}
+				e.preventDefault();
+				return false;
+			}
+		}
+	//edit: removed ";" from last "}" because of javascript error
+	</script> -->
+</html>
