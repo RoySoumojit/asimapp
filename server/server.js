@@ -63,6 +63,7 @@ app.use("/exam",express.static(path.join(__dirname,"../client","examclient","bui
 app.use('/practice',express.static(path.join(__dirname,"../client","practiceclient","build")))
 
 app.set('view engine', 'ejs');
+app.set('views',path.join(__dirname,"views"));
 //Routes for authentication
 app.use('/auth',authRoute)
 //Routes for Csv file
