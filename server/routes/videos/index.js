@@ -1,27 +1,13 @@
 const express=require('express')
 const Router=express.Router()
-const youtube=require('youtube-dl')
 const fs=require('fs')
 const path=require('path')
 const admin=require('firebase-admin')
 const fetch=require('node-fetch')
-const {isAdmin,isVideoUser,isSessionActive} =require('../../middleware/verification')
+const {isAdmin} =require('../../middleware/verification')
 const {checkVisibility}=require('../../middleware/videos/index')
 const hosts=["localhost","asimsirmath.in"]
-Router.get('/download/:id',async(req,res,next)=>{
-    try{
-        if(fs.existsSync(path.join(__dirname,"../../videos",`${req.params.id}.mp4`))){
-            res.status(400).send({message:"File already exists"})
-        }
-        const video =youtube(`https://www.youtube.com/watch?v=${req.params.id}`)
-        let newfilename=req.params.id
-        video.pipe(fs.createWriteStream(path.join(__dirname,"../../videos",`${newfilename}.mp4`)))
-        admin.firestore().collection('videos').add({link:req.params.id,date:Date.now(),title:req.params.title})
-        res.status(200).send("Success")
-    }catch(err){
-        res.status(500).send(err.message)
-    }
-})
+
 
 Router.get('/delete/:id/:jwt',isAdmin,(req,res,next)=>{
     try{
@@ -33,63 +19,7 @@ Router.get('/delete/:id/:jwt',isAdmin,(req,res,next)=>{
         res.status(500).send("Some error occure in deleteing the file")
     }
 })
-// Router.get('/show/iamthesupermanu/:id',isVideoUser,isSessionActive,(req,res,next)=>{
-//     try{
-//     if(req.session.view===1){
-//     const pathval = path.join(__dirname,"../../videos",`${req.params.id}.mp4`)
-// 	const stat = fs.statSync(pathval)
-// 	const fileSize = stat.size
-//     const range = req.headers.range
-// 	if (range) {
-// 		const parts = range.replace(/bytes=/, "").split("-")
-// 		const start = parseInt(parts[0], 10)
-// 		const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1
-// 		const chunksize = (end-start)+1
-// 		const file = fs.createReadStream(pathval, {start, end})
-// 		const head = {
-// 			'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-// 			'Accept-Ranges': 'bytes',
-// 			'Content-Length': chunksize,
-//             'Content-Type': 'video/mp4'
-//         }
-//         console.log("I am in if")
-//         res.writeHead(206, head)
-//         file.pipe(res)
-// 	} else {
-// 		const head = {
-// 			'Content-Length': fileSize,
-//             'Content-Type': 'video/mp4',
-//         }
-//         console.log("I am in else")
-// 		res.writeHead(200, head)
-// 		fs.createReadStream(pathval).pipe(res)
-//     }
-// }else{
-//     res.status(400).send({message:"video got corrupted"})
-// }
-// }catch(err){
-//     res.status(404).send("Page not found")
-// }
-// })
 
-// Router.get('/single/show/:id',checkVisibility,(req,res)=>{
-//     try{
-//         if(hosts.includes(req.headers.host)){
-//             if(fs.existsSync(path.join(__dirname,"../../videos",`${req.params.id}.mp4`))){
-//                 res.cookie('videojwt', req.session.jwt, { maxAge:3600000,httpOnly:true});
-                
-//                 res.render('videos/singleVideo',{id:req.params.id,error:null,
-//                     host:req.headers.host,keyid:"iamthesupermanu"})
-//             }else{
-//                 res.render('notfound',{host:req.headers.host})
-//             }
-//         }else{
-//             res.status(500).send("You have tempared with host")
-//         }
-//     }catch(err){
-//         res.render('videos/singleVideo',{exists:false,error:err.message})
-//     }
-// })
 Router.get("/single/show/:id",checkVisibility,async(req,res,next)=>{
     try{
         let val=await fetch(`https://dev.vdocipher.com/api/videos/${req.params.id}/otp`,{

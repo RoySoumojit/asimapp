@@ -143,5 +143,5 @@ app.get('*',(req,res)=>{
     res.sendFile(path.join(__dirname,"../client","mainclient","build",'index.html'))
 })
 app.listen(process.env.PORT||5000,()=>{
-    console.log("Server is listening")
+    console.log(`Server is listening ${process.env.PORT?process.env.PORT:5000}`)
 })

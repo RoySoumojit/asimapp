@@ -25,8 +25,7 @@
     "mongoose": "^5.9.6",
     "node-fetch": "^2.6.0",
     "uuid": "^8.0.0",
-    "web-push": "^3.4.3",
-    "youtube-dl": "^3.0.2"
+    "web-push": "^3.4.3"
   },
   "devDependencies": {
     "dot-env": "0.0.1",
