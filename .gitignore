@@ -7,6 +7,7 @@ client/mainclient/.gitignore
 client/mainclient/package.json
 client/mainclient/package-lock.json
 client/mainclient/README.md
+client/mainclient/.env
 client/examclient/node_modules
 client/examclient/public
 client/examclient/src
